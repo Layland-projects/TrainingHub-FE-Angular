@@ -1,21 +1,29 @@
 <div class="container col-md-9">
     <form>
-        <span class="row col-md-3">
-            <input class="form-control col-md-11" id="search" type="text" placeholder="Search..."/>
-            <button class="btn btn-primary" type="submit">Search</button>
-        </span>
+        <div class="row align-items-center pt-3">
+            <div class="col-auto ps-1">
+                <input class="form-control" id="search" type="text" placeholder="Search..."/>
+            </div>
+            <div class="col-auto ps-2">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </div>
     </form>
-    <div class="row align-items-center">
-        <ul class="list-group">
-            <li class="row mt-2">
+    <div class="row align-items-center ps-1">
+        <ul *ngIf="activities" class="list-group">
+            <li *ngFor="let act of activities" class="row mt-2">
                 <div class="col-md-3">
                     <div class="card">
-                        <img class="card-img" src="../../assets/activities/placeholder.png" title="placeholder" />
+                        <img class="card-img" [src]="act.image" [title]="act.title" />
                     </div>
                 </div>
                 <div class="col-md-9">
-                    <h5 class="card-title">Title</h5>
-                    <p>Description...</p>
+                    <div class="card bg-{{theme.background}} h-100">
+                        <div class="ps-1 text-{{theme.text}}">
+                            <h5 class="card-title">{{act.title}}</h5>
+                            <p>{{act.description}}</p>
+                        </div>
+                    </div>
                 </div>
             </li>
         </ul>

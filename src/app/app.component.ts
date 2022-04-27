@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ThemeService } from './shared/services/theme-service';
+import { SiteTheme } from './site-theme';
 
 @Component({
   selector: 'app-root',
@@ -7,6 +9,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'TrainingHub';
-  theme = 'light';
-  text = 'dark';
+  theme: SiteTheme = this.themeService.theme;
+  constructor(private themeService: ThemeService) {
+    this.themeService.themeChanged$.subscribe(theme => this.theme = theme);
+  }
 }
