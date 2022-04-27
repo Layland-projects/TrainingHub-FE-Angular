@@ -1,0 +1,44 @@
+<nav class="navbar navbar-expand-lg navbar-{{theme.background}} bg-{{theme.background}}">
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="">{{title}}</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <div class="navbar-nav me-auto mb-2 mb-lg-0">
+            <a class="nav-link" aria-current="page" routerLink="">Home</a>
+            <a class="nav-link" href="#">Features</a>
+            <a class="nav-link" href="#">Pricing</a>
+            <div *ngIf="user && user.role < 2">
+              <div ngbDropdown class="d-inline-block">
+                <a role="button" class="link-{{theme.text}} me-2 nav-link dropdown-toggle" id="admin" ngbDropdownToggle>Admin</a>
+                <div ngbDropdownMenu aria-labelledby="admin">
+                  <button ngbDropdownItem routerLink="users">Users</button>
+                  <button ngbDropdownItem routerLink="activities">Activities</button>
+                </div>
+              </div>       
+            </div>
+        </div>
+        <div *ngIf="!user">
+          <button class="btn btn-secondary" routerLink="login">Login</button>
+          <button class="btn  btn-secondary me-2 ms-2" routerLink="sign-up">Sign Up</button>
+        </div>
+        <div *ngIf="user">
+          <div ngbDropdown class="d-inline-block">
+            <a role="button" class="link-{{theme.text}} me-2 nav-link dropdown-toggle" id="displayName" ngbDropdownToggle>{{displayName}}</a>
+            <div ngbDropdownMenu aria-labelledby="displayName">
+              <button ngbDropdownItem>My Account</button>
+              <button ngbDropdownItem [routerLink]="'users/' + user.id">Edit Profile</button>
+              <button ngbDropdownItem (click)="logout()">Logout</button>
+            </div>
+          </div>        
+        </div>
+        <span class="navbar-text">
+          <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="theme-switch" (change)="swapTheme()"/>
+              <label class="form-check-label" for="theme-switch">Dark Mode</label>
+          </div>
+        </span>
+      </div>
+    </div>
+  </nav>

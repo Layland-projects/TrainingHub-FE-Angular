@@ -1,0 +1,45 @@
+<div class="container col-md-6 mt-3">
+    <div class="row align-items-center">
+        <div class="card text-{{theme.text}} bg-{{theme.background}}">
+          <!-- <img class="card-img-top" src="holder.js/100px180/" alt=""> -->
+          <div class="card-body">
+            <h4 class="card-title text-center">Sign Up</h4>
+            <form [formGroup]="signUpForm" (ngSubmit)="submit()">
+                <div class="mb-3">
+                    <label class="form-label" for="role">Role</label>
+                    <select class="form-select" name="roles" formControlName="role" (change)="selectRole()">
+                        <option *ngIf="!selectedRole" value="" selected></option>
+                        <option *ngFor="let role of roles" [value]="role.value">{{role.name}}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <select class="form-select" name="titles" id="title" formControlName="title">
+                        <option *ngFor="let title of titles" [value]="title">{{title}}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="firstName">Forename</label>
+                    <input class="form-control" id="firstName" type="text" formControlName="firstName" placeholder="Forename"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="lastName">Surname</label>
+                    <input class="form-control" id="lastName" type="text" formControlName="lastName" placeholder="Surname"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="email">Email</label>
+                    <input class="form-control" id="email" type="email" formControlName="email" placeholder="Email"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="password">Password</label>
+                    <input class="form-control" id="password" type="password" formControlName="password" placeholder="Password"/>
+                </div>
+                <button class="btn btn-primary" type="submit">Submit</button>
+                <span class="float-end mt-3 ">
+                    <a routerLink="../login">Have an account? Sign in</a>
+                </span>
+            </form>
+          </div>
+        </div>
+    </div>
+</div>
