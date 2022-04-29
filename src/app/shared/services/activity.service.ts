@@ -29,6 +29,24 @@ export class ActivityService {
           }
           return val;
         })
-      )
+      );
+  }
+
+  getActivity(id: number): Observable<Result<Activity>> {
+    let url = this.apiUrl + id;
+    return this.http.get<Result<Activity>>(url)
+      .pipe(
+        tap(res => {
+          if (this.logging) {
+            console.log(`ActivityService | GetActivities | Status: ${res.status}`);
+          }
+        }),
+        map(val => {
+          if (val.data) {
+            val.data.image = this.imgUrl + val.data.image;
+          }
+          return val;
+        })
+      );
   }
 }

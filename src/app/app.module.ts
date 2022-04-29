@@ -16,6 +16,7 @@ import { UsersComponent } from './users/users.component';
 import { SessionsComponent } from './sessions/sessions.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { ActivitiesComponent } from './activities/activities.component';
+import { ActivityEditComponent } from './activity-edit/activity-edit.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { ActivitiesComponent } from './activities/activities.component';
     UsersComponent,
     SessionsComponent,
     NotFoundComponent,
-    ActivitiesComponent
+    ActivitiesComponent,
+    ActivityEditComponent
   ],
   imports: [
     BrowserModule,
