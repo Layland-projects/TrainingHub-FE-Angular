@@ -14,6 +14,7 @@ import { SignOutDto } from '../../dtos/sign-out-dto';
 import { UpdateEmailDto } from '../../dtos/update-email-dto';
 import { UpdatePasswordDto } from '../../dtos/update-password-dto';
 import { Result } from '../../models/result';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,8 @@ import { Result } from '../../models/result';
 export class UserService {
   userSignedIn$: EventEmitter<User>;
   userSignedOut$: EventEmitter<number>;
-  displayName?: string | null = '';
-  loggedInUser?: User | null;
+  displayName?: string = '';
+  loggedInUser?: User;
   private apiUrl: string = environment.apiUrl + "users/";
   private logging: boolean = environment.loggingEnabled;
   private httpOptions = {
@@ -32,9 +33,18 @@ export class UserService {
   constructor(private http: HttpClient,
     private route: ActivatedRoute,
     private location: Location,
-    private router: Router) {
-    this.userSignedIn$ = new EventEmitter();
-    this.userSignedOut$ = new EventEmitter();
+    private router: Router,
+    private storage: StorageService) {
+      this.userSignedIn$ = new EventEmitter();
+      this.userSignedOut$ = new EventEmitter();
+      let uId = this.storage.get<number>('userId');
+      if (uId) {
+        this.getUser(uId).subscribe(usr => {
+          if (usr.data) {
+            this.signIn(usr.data.email, usr.data.password ?? "123").subscribe();
+          }
+        })
+      }
    }
 
   getUsers(pageSize: number = 10, pageNum: number = 0) : Observable<Result<User[]>> {
@@ -65,6 +75,7 @@ export class UserService {
             if (user !== undefined) {
               this.setDisplayName(user);
               this.loggedInUser = user;
+              this.storage.add('userId', user.id);
               this.userSignedIn$.emit(user);
               this.router.navigate(['../'], { relativeTo: this.route });
             }
@@ -109,8 +120,11 @@ export class UserService {
         if (this.logging) {
           console.log('User Service | SignOut Success', res);
         }
-        this.displayName = null;
-        this.loggedInUser = null;
+        this.displayName = undefined;
+        this.loggedInUser = undefined;
+        if (this.storage.get<number>('userId')) {
+          this.storage.remove('userId');
+        }
         this.userSignedOut$.emit(id);
       }),
       catchError(this.handleError<Result<any>>('logout'))

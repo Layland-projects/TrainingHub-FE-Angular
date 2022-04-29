@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Role } from '../models/role';
 import { RoleService } from '../shared/services/role.service';
 import { SiteTheme } from '../site-theme';
 import { ThemeService } from '../shared/services/theme-service';
 import { TitleService } from '../shared/services/title.service';
 import { UserService } from '../shared/services/user-service';
+import { UserValidators } from '../shared/validators/user-validators';
 
 @Component({
   selector: 'app-sign-up',
@@ -18,6 +19,13 @@ export class SignUpComponent implements OnInit {
   roles?: Role[];
   titles?: string[];
   selectedRole: boolean = false;
+  get email() { return this.signUpForm.get('email'); }
+  get password() { return this.signUpForm.get('password'); }
+  get title() { return this.signUpForm.get('title'); }
+  get firstName() { return this.signUpForm.get('firstName'); }
+  get lastName() { return this.signUpForm.get('lastName'); }
+  get role() { return this.signUpForm.get('role'); }
+  get isValid() { return this.signUpForm.valid; }
 
   constructor(
     private themeService: ThemeService,
@@ -34,12 +42,33 @@ export class SignUpComponent implements OnInit {
   }
   
   signUpForm = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl(''),
-    title: new FormControl(''),
-    firstName: new FormControl(''),
-    lastName: new FormControl(''),
-    role: new FormControl(''),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1),
+      Validators.email,
+    ]),
+    password: new FormControl('', 
+      Validators.required
+    ),
+    title: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1),
+      UserValidators.validTitle
+    ]),
+    firstName: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1),
+      //custom validator for no special characters e.g @!?
+    ]),
+    lastName: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1)
+      //custom validator for no special characters e.g @!?
+    ]),
+    role: new FormControl('', [
+      Validators.required,
+      UserValidators.validRole
+    ]),
   })
 
   updateTheme(theme: SiteTheme): void {

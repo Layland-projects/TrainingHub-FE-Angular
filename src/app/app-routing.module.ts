@@ -6,6 +6,7 @@ import { LoginComponent } from './login/login.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { PasswordRecoveryComponent } from './password-recovery/password-recovery.component';
 import { UserLoggedInGuard } from './shared/guards/user-logged-in.guard';
+import { UserNotLoggedInGuard } from './shared/guards/user-not-logged-in.guard';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 import { UserProfileGuard } from './user-profile/user-profile.guard';
@@ -13,24 +14,48 @@ import { UsersComponent } from './users/users.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'sign-up', component: SignUpComponent },
-  { path: 'password-recovery', component: PasswordRecoveryComponent},
+  { 
+    path: 'login', 
+    component: LoginComponent,
+    canActivate: [
+      UserNotLoggedInGuard
+    ] 
+  },
+  { 
+    path: 'sign-up',
+    component: SignUpComponent,
+    canActivate: [
+      UserNotLoggedInGuard
+    ]
+  },
+  { 
+    path: 'password-recovery',
+    component: PasswordRecoveryComponent,
+    canActivate: [
+      UserNotLoggedInGuard
+    ]
+  },
   { 
     path: 'users', 
     component: UsersComponent,
-    canActivate: [UserLoggedInGuard]
+    canActivate: [
+      UserLoggedInGuard
+    ]
   },
   { 
     path: 'users/:id', 
     component: UserProfileComponent,
-    canActivate: [UserProfileGuard, 
-      // UserLoggedInGuard
+    canActivate: [
+      UserProfileGuard, 
+      UserLoggedInGuard
     ]
   },
   { 
     path: 'activities',
-    component: ActivitiesComponent
+    component: ActivitiesComponent,
+    canActivate: [
+      UserLoggedInGuard
+    ]
   },
   { path: "**", component: NotFoundComponent },
 ];
