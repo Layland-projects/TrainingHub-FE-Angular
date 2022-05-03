@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Route, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Activity } from '../models/activity';
 import { ActivityService } from '../shared/services/activity.service';
 import { ThemeService } from '../shared/services/theme-service';
+import { ActivityValidators } from '../shared/validators/activity-validators';
 import { SiteTheme } from '../site-theme';
 
 @Component({
@@ -30,15 +31,57 @@ export class ActivityEditComponent implements OnInit, OnDestroy {
     this.themeService.themeChanged$.subscribe(theme => this.theme = theme);
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.subs.push(
-      this.activityService.getActivity(id).subscribe(act => this.activity = act.data)
+      this.activityService.getActivity(id).subscribe(act => {
+        this.activity = act.data;
+        this.populateFormDefaults();
+      })
     );
   }
 
   updateForm = new FormGroup({
-    field: new FormControl('')
+    title: new FormControl('', [
+      Validators.required
+    ]),
+    description: new FormControl('', [
+      Validators.required
+    ]),
+    type: new FormControl('', [
+      Validators.required,
+      ActivityValidators.validType
+    ]),
+    image: new FormControl('', [
+      Validators.required,
+      ActivityValidators.validImg
+    ]),
+    isBodyWeight: new FormControl('', [
+      Validators.required
+    ])
   })
 
   submit(): void {
 
+  }
+
+  populateFormDefaults(): void {
+    let title = this.updateForm.get('title');
+    if (title) {
+      title.setValue(this.activity?.title);
+    }
+    let description = this.updateForm.get('description');
+    if (description) {
+      description.setValue(this.activity?.description);
+    }
+    let type = this.updateForm.get('type');
+    if (type) {
+      type.setValue(this.activity?.type);
+    }
+    let image = this.updateForm.get('image');
+    if (image) {
+      image.setValue(this.activity?.image);
+    }
+    let isBodyWeight = this.updateForm.get('isBodyWeight');
+    if (isBodyWeight) {
+      isBodyWeight.setValue(this.activity?.isBodyWeight);
+    }
   }
 }

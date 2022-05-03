@@ -4,6 +4,7 @@ import { map, Observable, tap } from 'rxjs';
 import { Activity } from 'src/app/models/activity';
 import { Result } from 'src/app/models/result';
 import { environment } from 'src/environments/environment';
+import { ImageService } from './image.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,8 @@ import { environment } from 'src/environments/environment';
 export class ActivityService {
   private apiUrl = environment.apiUrl + "activities/"
   private logging: boolean = environment.loggingEnabled;
-  private imgUrl = environment.activitiesImgUrl;
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private imgService: ImageService) { }
 
   getActivities(pageNo: number = 0, pageSize: number = 10): Observable<Result<Activity[]>> {
     let url = this.apiUrl + `?pageNo=${pageNo}&pageSize=${pageSize}`;
@@ -25,7 +26,7 @@ export class ActivityService {
         }),
         map(val => {
           if (val.data) {
-            val.data.forEach(rec => rec.image = this.imgUrl + rec.image);
+            val.data.forEach(rec => rec.image = this.imgService.getActivitiesImg(rec.image));
           }
           return val;
         })
@@ -43,10 +44,12 @@ export class ActivityService {
         }),
         map(val => {
           if (val.data) {
-            val.data.image = this.imgUrl + val.data.image;
+            val.data.image = this.imgService.getActivitiesImg(val.data.image);
           }
           return val;
         })
       );
   }
+
+  //Todo: add update method
 }
