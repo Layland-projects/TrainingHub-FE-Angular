@@ -45,7 +45,7 @@ export class ActivityService {
       .pipe(
         tap(res => {
           if (this.logging) {
-            console.log(`ActivityService | GetActivities | Status: ${res.status}`);
+            console.log(`ActivityService | GetActivity | Status: ${res.status}`, res.data);
           }
         }),
         map(val => {
