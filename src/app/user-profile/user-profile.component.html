@@ -3,12 +3,37 @@
         <div class="card text-{{theme.text}} bg-{{theme.background}}">
           <!-- <img class="card-img-top" src="holder.js/100px180/" alt=""> -->
           <div class="card-body">
-            <h4 class="card-title text-center">{{user.firstName}}'s Profile</h4>
+            <h4 class="card-title text-center">{{user.firstName ? user.firstName + "'s " : ""}}Profile</h4>
             <form [formGroup]="updateForm" (ngSubmit)="submit()">
+                <!-- Using an error summary insetead of inline errors like on the other forms -->
+                <div *ngIf="!isValid && (form.touched || form.dirty)" class="alert alert-danger">
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li *ngIf="title && (title.touched || title.dirty) && title.invalid && title.errors">
+                            <div *ngIf="title.errors['required']">Title is required.</div>
+                            <div *ngIf="title.errors['title']">{{title.errors['title'].value}}</div>
+                        </li>
+                        <li *ngIf="firstName && (firstName.touched || firstName.dirty) && firstName.invalid && firstName.errors">
+                            <div *ngIf="firstName.errors['required']">Forename is required.</div>
+                        </li>
+                        <li *ngIf="lastName && (lastName.touched || lastName.dirty) && lastName.invalid && lastName.errors">
+                            <div *ngIf="lastName.errors['required']">Surname is required.</div>
+                        </li>
+                        <li *ngIf="email && (email.touched || email.dirty) && email.invalid && email.errors">
+                            <div *ngIf="email.errors['required']">Email is required.</div>
+                            <div *ngIf="email.errors['email']">Please enter a valid Email.</div>
+                        </li>
+                        <!-- rule should be the same as the others here but as I'm not actually pulling back passwords I've modified it to make it looser so you will see the error for the password being empty -->
+                        <li *ngIf="password && password.invalid && password.errors">
+                            <div *ngIf="password.errors['required']">Password is required.</div>
+                        </li>
+                    </ul>
+                </div>
                 <div class="mb-3">
-                    <!-- Make into drop down selection -->
                     <label class="form-label" for="title">Title</label>
-                    <input class="form-control" id="title" type="text" formControlName="title" placeholder="Title"/>
+                    <select class="form-select" name="titles" id="title" formControlName="title">
+                        <option *ngFor="let title of titles" [value]="title">{{title}}</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="firstName">Forename</label>
@@ -26,7 +51,7 @@
                     <label class="form-label" for="password">Password</label>
                     <input class="form-control" id="password" type="password" formControlName="password" placeholder="Password"/>
                 </div>
-                <button class="btn btn-primary" type="submit">Submit</button>
+                <button [disabled]="!isValid" class="btn btn-primary" type="submit">Submit</button>
             </form>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
+import { ActivityType } from "src/app/models/activity-type";
 
-const validTypes = [
+const validTypes: ActivityType[] = [
     { name: 'Timed', value: 1 },
     { name: 'Repetitions', value: 2 }
 ]

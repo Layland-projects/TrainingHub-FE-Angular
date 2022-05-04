@@ -1,11 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { first, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { SiteTheme } from '../site-theme';
 import { ThemeService } from '../shared/services/theme-service';
 import { User } from '../models/user';
 import { UserService } from '../shared/services/user-service';
+import { TitleService } from '../shared/services/title.service';
+import { UserValidators } from '../shared/validators/user-validators';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-user-profile',
@@ -16,16 +19,29 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   theme: SiteTheme = this.themeService.theme;
   user?: User | null | undefined;
   subs: Subscription[] = [];
+  titles: string[] = [];
+
+  get isValid() { return this.updateForm.valid; }
+  get form() { return this.updateForm; }
+  get title() { return this.updateForm.get('title'); }
+  get firstName() { return this.updateForm.get('firstName'); }
+  get lastName() { return this.updateForm.get('lastName'); }
+  get email() { return this.updateForm.get('email'); }
+  get password() {return this.updateForm.get('password'); }
+
   constructor(
     private themeService: ThemeService,
     private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute) {
+    private route: ActivatedRoute,
+    private titleService: TitleService,
+    private location: Location) {
       this.updateForm.controls['firstName'].valueChanges.subscribe(val => {
         if (this.user != undefined) {
           this.user.firstName = val;
         }
       });
+      this.titleService.getTitles().subscribe(titles => this.titles = titles);
     }
 
   ngOnDestroy(): void {
@@ -38,23 +54,30 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       if (id !== undefined && id > 0) {
         this.userService.getUser(id).subscribe(user => {
           this.user = user.data;
-          if (user.status !== 1){
-            this.router.navigate(['../'], { relativeTo: this.route });
-          }
-          else {
-            this.refreshFormDefaults();
-          }
+          this.refreshFormDefaults();
         });
       }
     }));
   }
 
   updateForm = new FormGroup({
-    title: new FormControl(this.user?.title),
-    firstName: new FormControl(this.user?.firstName),
-    lastName: new FormControl(this.user?.lastName),
-    email: new FormControl(this.user?.email),
-    password: new FormControl(this.user?.password),
+    title: new FormControl(this.user?.title, [
+      Validators.required,
+      UserValidators.validTitle
+    ]),
+    firstName: new FormControl(this.user?.firstName, [
+      Validators.required
+    ]),
+    lastName: new FormControl(this.user?.lastName, [
+      Validators.required
+    ]),
+    email: new FormControl(this.user?.email, [
+      Validators.required,
+      Validators.email
+    ]),
+    password: new FormControl(this.user?.password, [
+      Validators.required
+    ]),
   })
 
   refreshFormDefaults(): void {
@@ -82,19 +105,14 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       this.userService.updatePassword(this.user!.id, password.value).subscribe();
     }
     if (textualInfo.length > 0) {
-      textualInfo.forEach(field => {
-        if (field.dirty && field.valid) {
-          this.subs.push(this.userService.updateUserInfo(this.user!.id, {
-            id: this.user?.id,
-            title: title?.value,
-            firstName: firstName?.value,
-            lastName: lastName?.value
-          } as User).subscribe({
-            complete: () => this.router.navigate([''], { relativeTo: this.route })
-          }));
-          return;
-        }
-      })
+      this.subs.push(this.userService.updateUserInfo(this.user!.id, {
+        id: this.user?.id,
+        title: title?.value,
+        firstName: firstName?.value,
+        lastName: lastName?.value
+      } as User).subscribe({
+        complete: () => this.location.back()
+      }));
     }
   }
 }

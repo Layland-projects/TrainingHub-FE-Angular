@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ActivitiesComponent } from './activities/activities.component';
+import { ActivityEditComponent } from './activity-edit/activity-edit.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { NotFoundComponent } from './not-found/not-found.component';
@@ -53,6 +54,13 @@ const routes: Routes = [
   { 
     path: 'activities',
     component: ActivitiesComponent,
+    canActivate: [
+      UserLoggedInGuard
+    ]
+  },
+  {
+    path: 'activities/:id',
+    component: ActivityEditComponent,
     canActivate: [
       UserLoggedInGuard
     ]

@@ -13,6 +13,9 @@ export class ImageService {
     if (img === undefined) {
       img = 'placeholder.png';
     }
+    if (img.includes(this.activitiesImgUrl)) {
+      return img;
+    }
     return this.activitiesImgUrl + img;
   }
 }
