@@ -11,30 +11,55 @@
                         <option *ngIf="!selectedRole" value="" selected></option>
                         <option *ngFor="let role of roles" [value]="role.value">{{role.name}}</option>
                     </select>
+                    <div *ngIf="role && role.invalid && (role.touched || role.dirty)" class="alert alert-danger mt-1">
+                        <div *ngIf="role.errors?.['required']">Please select a role</div>
+                        <div *ngIf="role.errors?.['role']">{{role.errors?.['role'].value}}</div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="title">Title</label>
                     <select class="form-select" name="titles" id="title" formControlName="title">
                         <option *ngFor="let title of titles" [value]="title">{{title}}</option>
                     </select>
+                    <div *ngIf="title && title.invalid && (title.touched || title.dirty)" class="alert alert-danger mt-1">
+                        <div *ngIf="title.errors?.['required']">Please select a role</div>
+                        <div *ngIf="title.errors?.['title']">{{title.errors?.['title'].value}}</div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="firstName">Forename</label>
                     <input class="form-control" id="firstName" type="text" formControlName="firstName" placeholder="Forename"/>
+                    <div *ngIf="firstName && firstName.invalid && (firstName.touched || firstName.dirty)" class="alert alert-danger mt-1">
+                        <div *ngIf="firstName.errors?.['required']">Forename is required</div>
+                        <div *ngIf="firstName.errors?.['minlength']">Forename should be at least 1 character</div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="lastName">Surname</label>
                     <input class="form-control" id="lastName" type="text" formControlName="lastName" placeholder="Surname"/>
+                    <div *ngIf="lastName && lastName.invalid && (lastName.touched || lastName.dirty)" class="alert alert-danger mt-1">
+                        <div *ngIf="lastName.errors?.['required']">Surname is required</div>
+                        <div *ngIf="lastName.errors?.['minlength']">Surname should be at least 1 character</div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="email">Email</label>
                     <input class="form-control" id="email" type="email" formControlName="email" placeholder="Email"/>
+                    <div *ngIf="email && email.invalid && (email.touched || email.dirty)" class="alert alert-danger mt-1">
+                        <div *ngIf="email.errors?.['required']">Email is required</div>
+                        <div *ngIf="email.errors?.['minlength']">Email should be at least 1 character</div>
+                        <div *ngIf="email.errors?.['email']">Please enter a valid Email</div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="password">Password</label>
                     <input class="form-control" id="password" type="password" formControlName="password" placeholder="Password"/>
+                    <div *ngIf="password && password.invalid && (password.touched || password.dirty)" class="alert alert-danger mt-1">
+                        <div *ngIf="password.errors?.['required']">Password is required</div>
+                        <div *ngIf="password.errors?.['minlength']">Password should be at least 1 character</div>
+                    </div>
                 </div>
-                <button class="btn btn-primary" type="submit">Submit</button>
+                <button [disabled]="!isValid" class="btn btn-primary" type="submit">Submit</button>
                 <span class="float-end mt-3 ">
                     <a routerLink="../login">Have an account? Sign in</a>
                 </span>

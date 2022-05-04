@@ -7,6 +7,7 @@ import { User } from '../models/user';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { StorageService } from '../shared/services/storage.service';
 
 @Component({
   selector: 'app-navigation',
@@ -15,19 +16,21 @@ import { environment } from 'src/environments/environment';
 })
 
 export class NavigationComponent implements OnInit, OnDestroy {
-  @Input() title: string = '';
-  theme = this.themeService.theme;
-  displayName: string | null | undefined = this.userService.displayName;
-  user?: User;
-  subs: Subscription[] = [];
-  logging: boolean = environment.loggingEnabled;
-
   constructor(
     private themeService: ThemeService,
     private userService: UserService,
-    private router: Router) {
-      
-    }
+    private router: Router
+  ) 
+  {
+    
+  }
+
+  @Input() title: string = '';
+  theme = this.themeService.theme;
+  displayName?: string = this.userService.displayName;
+  user?: User;
+  subs: Subscription[] = [];
+  logging: boolean = environment.loggingEnabled;
   ngOnDestroy(): void {
     this.subs.forEach(sub => sub.unsubscribe());
   }
@@ -56,7 +59,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.subs.push(this.userService.logout(this.userService.loggedInUser.id)
       .subscribe(
         res => {
-          this.displayName = null;
+          this.displayName = undefined;
           this.user = undefined;
           this.router.navigate(['']);
         }

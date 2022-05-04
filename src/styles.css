@@ -1,1 +1,4 @@
-@import "~bootstrap/dist/css/bootstrap.css"
+.ng-invalid.ng-touched {
+    border-color: red;
+    mask-border-width: 3px;
+}

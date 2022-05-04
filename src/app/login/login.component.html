@@ -8,15 +8,24 @@
                 <div class="mb-3">
                     <label class="form-label" for="email">Email</label>
                     <input class="form-control" id="email" type="email" formControlName="email" placeholder="Email"/>
+                    <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="alert alert-danger mt-1">
+                        <div *ngIf="email?.errors?.['required']">Email is required</div>
+                        <div *ngIf="email?.errors?.['minlength']">Email must contain a value</div>
+                        <div *ngIf="email?.errors?.['email']">Please enter a valid Email</div>
+                    </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="password">Password</label>
                     <input class="form-control" id="password" type="password" formControlName="password" placeholder="Password"/>
+                    <div *ngIf="password && password?.invalid && (password?.dirty || password?.touched)" class="alert alert-danger mt-1">
+                        <div *ngIf="password.errors?.['required']">Password is required</div>
+                        <div *ngIf="password.errors?.['minlength']">Password must contain at least 1 character</div>
+                    </div>
                     <div id="forgotPassword" class="form-text">
                         <a routerLink="../password-recovery">forgotten password?</a>
                     </div>
                 </div>
-                <button class="btn btn-primary" type="submit">Submit</button>
+                <button [disabled]="!isValid" class="btn btn-primary" type="submit">Submit</button>
                 <span class="float-end mt-3 ">
                     <a routerLink="../sign-up">Not got an account? Sign up</a>
                 </span>

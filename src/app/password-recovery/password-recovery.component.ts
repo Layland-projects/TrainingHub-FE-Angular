@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { SiteTheme } from '../site-theme';
 import { ThemeService } from '../shared/services/theme-service';
 import { UserService } from '../shared/services/user-service';
@@ -11,6 +11,8 @@ import { UserService } from '../shared/services/user-service';
 })
 export class PasswordRecoveryComponent implements OnInit {
   theme: SiteTheme = this.themeService.theme;
+  get email() { return this.recoveryForm.get('email'); }
+  get isValid() { return this.recoveryForm.valid; }
 
   constructor(
     private themeService: ThemeService,
@@ -23,7 +25,11 @@ export class PasswordRecoveryComponent implements OnInit {
   }
   
   recoveryForm = new FormGroup({
-    email: new FormControl('')
+    email: new FormControl('', [
+      Validators.required,
+      Validators.minLength(1),
+      Validators.email
+    ])
   })
 
   updateTheme(theme: SiteTheme): void {

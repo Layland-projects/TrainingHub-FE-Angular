@@ -1,0 +1,61 @@
+<div *ngIf="activity" class="container col-md-9 mt-3">
+    <div class="row align-items-center">
+        <div class="card text-{{theme.text}} bg-{{theme.background}}">
+          <!-- <img class="card-img-top" src="holder.js/100px180/" alt=""> -->
+          <div class="card-body">
+            <h4 class="card-title text-center">{{activity.title}}'s Profile</h4>
+            <form [formGroup]="updateForm" (ngSubmit)="submit()">
+                <!-- Using an error summary insetead of inline errors like on the other forms -->
+                <div *ngIf="!isValid && (form.touched || form.dirty)" class="alert alert-danger">
+                    <h4>Errors:</h4>
+                    <ul>
+                        <li *ngIf="title && (title.touched || title.dirty) && title.invalid && title.errors">
+                            <div *ngIf="title.errors['required']">Title is required.</div>
+                        </li>
+                        <li *ngIf="description && (description.touched || description.dirty) && description.invalid && description.errors">
+                            <div *ngIf="description.errors['required']">Description is required.</div>
+                        </li>
+                        <li *ngIf="type && (type.touched || type.dirty) && type.invalid && type.errors">
+                            <div *ngIf="type.errors['required']">Activity type is required.</div>
+                        </li>
+                        <li *ngIf="isBodyWeight && (isBodyWeight.touched || isBodyWeight.dirty) && isBodyWeight.invalid && isBodyWeight.errors">
+                            <div *ngIf="isBodyWeight.errors['required']">Email is required.</div>
+                        </li>
+                        <!-- rule should be the same as the others here but as I'm not actually pulling back passwords I've modified it to make it looser so you will see the error for the password being empty -->
+                        <li *ngIf="image && image.invalid && image.errors">
+                            <div *ngIf="image.errors['validImg']">{{image.errors['validImg'].value}}</div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="title">Title</label>
+                    <input class="form-control" id="title" type="text" formControlName="title" placeholder="Title" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-control" id="description" rows="3" formControlName="description" placeholder="Description"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="type">Type</label>
+                    <select class="form-select" name="type" id="type" formControlName="type">
+                        <option *ngFor="let type of types" [value]="type.value">{{type.name}}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="isBodyWeight">IsBodyWeight</label>
+                    <div class="form-switch">
+                        <input class="form-check-input" id="isBodyWeight" type="checkbox" formControlName="isBodyWeight"/>
+                    </div>
+                    
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="image">Display Image</label>
+                    <!-- <input [src]="image?.value" class="form-control" id="image" type="image" formControlName="image" /> -->
+                    <input class="form-control" id="image" name="image" type="file" formControlName="image">
+                </div>
+                <button [disabled]="!isValid" class="btn btn-primary" type="submit">Submit</button>
+            </form>
+          </div>
+        </div>
+    </div>
+</div>

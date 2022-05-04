@@ -1,6 +1,6 @@
 <div class="container col-md-9">
     <form>
-        <div class="row align-items-center pt-3">
+        <div class="row align-items-center mt-3">
             <div class="col-auto ps-1">
                 <input class="form-control" id="search" type="text" placeholder="Search..."/>
             </div>
@@ -14,16 +14,18 @@
             <li *ngFor="let act of activities" class="row mt-2">
                 <div class="col-md-3">
                     <div class="card">
-                        <img class="card-img" [src]="act.image" [title]="act.title" />
+                        <a [routerLink]=""></a>
+                        <img class="card-img" [src]="act.image" [title]="act.title"/>
                     </div>
                 </div>
                 <div class="col-md-9">
-                    <div class="card bg-{{theme.background}} h-100">
+                    <div class="card bg-{{theme.background}} h-75">
                         <div class="ps-1 text-{{theme.text}}">
                             <h5 class="card-title">{{act.title}}</h5>
                             <p>{{act.description}}</p>
                         </div>
                     </div>
+                    <button class="btn btn-primary mt-2" type="button" [routerLink]="'./' + act.id">Edit</button>
                 </div>
             </li>
         </ul>
