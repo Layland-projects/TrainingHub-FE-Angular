@@ -2,5 +2,9 @@ export const environment = {
   production: true,
   apiUrl: '',
   loggingEnabled: false,
-  activitesImgUrl: ''
+  activitesImgUrl: '',
+  azureAD: {
+    authUrl: '',
+    graphUrl: '',
+  }
 };

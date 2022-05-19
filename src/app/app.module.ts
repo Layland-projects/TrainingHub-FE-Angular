@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule} from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -17,6 +17,12 @@ import { SessionsComponent } from './sessions/sessions.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { ActivitiesComponent } from './activities/activities.component';
 import { ActivityEditComponent } from './activity-edit/activity-edit.component';
+import { MsalGuard, MsalInterceptor, MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
+import { InteractionType, PublicClientApplication } from '@azure/msal-browser';
+import { environment } from 'src/environments/environment';
+import { MeComponent } from './me/me.component';
+
+const isIE = window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigator.userAgent.indexOf('Trident/') > -1;
 
 @NgModule({
   declarations: [
@@ -31,7 +37,8 @@ import { ActivityEditComponent } from './activity-edit/activity-edit.component';
     SessionsComponent,
     NotFoundComponent,
     ActivitiesComponent,
-    ActivityEditComponent
+    ActivityEditComponent,
+    MeComponent
   ],
   imports: [
     BrowserModule,
@@ -39,9 +46,46 @@ import { ActivityEditComponent } from './activity-edit/activity-edit.component';
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
-    NgbModule
+    NgbModule,
+    MsalModule.forRoot(new PublicClientApplication({
+      auth: {
+        clientId: "f45cae57-dd3e-46d7-8d33-f788033bce25",
+        authority: "https://login.microsoftonline.com/f26c353e-08e3-45cb-aa2a-a2231a391931",
+        redirectUri: "https://localhost:4200"
+      },
+      cache: {
+        cacheLocation: "localStorage",
+        storeAuthStateInCookie:isIE
+      }
+    }), {
+      interactionType: InteractionType.Redirect,
+      authRequest: {
+        scopes: [
+          "user.read",
+          "Directory.Read.All",
+          "user.readwrite",
+          environment.azureAD.authUrl + 'AngularApp',
+        ]
+      }
+    }, {
+      interactionType: InteractionType.Redirect,
+      protectedResourceMap: new Map([
+        [environment.azureAD.graphUrl + 'me', ['user.read']],
+        [environment.azureAD.graphUrl + 'me/*', ['Directory.Read.All']],
+        [environment.azureAD.graphUrl + 'users/*/memberOf', ['Directory.Read.All']],
+        [environment.azureAD.graphUrl + 'users/*', ['user.readwrite']],
+        [environment.apiUrl + '*', [ environment.azureAD.authUrl + 'AngularApp']]
+      ])
+    })
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: MsalInterceptor,
+      multi: true
+    },
+    MsalGuard
+  ],
+  bootstrap: [AppComponent, MsalRedirectComponent]
 })
 export class AppModule { }

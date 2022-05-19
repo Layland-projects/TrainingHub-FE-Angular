@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { MsalGuard } from '@azure/msal-angular';
 import { ActivitiesComponent } from './activities/activities.component';
 import { ActivityEditComponent } from './activity-edit/activity-edit.component';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
+import { MeComponent } from './me/me.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { PasswordRecoveryComponent } from './password-recovery/password-recovery.component';
 import { UserLoggedInGuard } from './shared/guards/user-logged-in.guard';
@@ -18,29 +20,29 @@ const routes: Routes = [
   { 
     path: 'login', 
     component: LoginComponent,
-    canActivate: [
-      UserNotLoggedInGuard
-    ] 
+    // canActivate: [
+    //   UserNotLoggedInGuard
+    // ] 
   },
   { 
     path: 'sign-up',
     component: SignUpComponent,
-    canActivate: [
-      UserNotLoggedInGuard
-    ]
+    // canActivate: [
+    //   UserNotLoggedInGuard
+    // ]
   },
   { 
     path: 'password-recovery',
     component: PasswordRecoveryComponent,
-    canActivate: [
-      UserNotLoggedInGuard
-    ]
+    // canActivate: [
+    //   UserNotLoggedInGuard
+    // ]
   },
   { 
     path: 'users', 
     component: UsersComponent,
     canActivate: [
-      UserLoggedInGuard
+      MsalGuard
     ]
   },
   { 
@@ -48,27 +50,39 @@ const routes: Routes = [
     component: UserProfileComponent,
     canActivate: [
       UserProfileGuard, 
-      UserLoggedInGuard
+      MsalGuard
     ]
   },
   { 
     path: 'activities',
     component: ActivitiesComponent,
     canActivate: [
-      UserLoggedInGuard
+      MsalGuard
     ]
   },
   {
     path: 'activities/:id',
     component: ActivityEditComponent,
     canActivate: [
-      UserLoggedInGuard
+      MsalGuard
+    ]
+  },
+  {
+    path: 'me',
+    component: MeComponent,
+    canActivate: [
+      MsalGuard
     ]
   },
   { path: "**", component: NotFoundComponent },
 ];
+
+const isIframe = window !== window.parent && !window.opener;
+
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    initialNavigation: !isIframe ? 'enabled' : 'disabled'
+  })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
