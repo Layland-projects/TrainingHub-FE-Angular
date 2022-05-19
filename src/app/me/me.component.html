@@ -1,0 +1,52 @@
+
+
+<div class="container col-md-9 mt-3">
+    <div class="row align-items-center">
+        <div class="card text-{{theme.text}} bg-{{theme.background}}">
+          <!-- <img class="card-img-top" src="holder.js/100px180/" alt=""> -->
+            <div class="card-body">
+                <h4 class="card-title text-center">{{username ? username + "'s " : ""}}Profile</h4>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Id: </strong>
+                    </div>
+                    <div class="col-md-9">
+                        {{profile?.id}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>First Name: </strong>
+                    </div>
+                    <div class="col-md-9">
+                        {{profile?.givenName}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Last Name: </strong>
+                    </div>
+                    <div class="col-md-9">
+                        {{profile?.surname}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Email: </strong>
+                    </div>
+                    <div class="col-md-9">
+                        {{profile?.userPrincipalName}}
+                    </div>
+                </div>
+                <div *ngIf="groups" class="row">
+                    <div class="col-md-3">
+                        <strong>Groups: </strong>
+                    </div>
+                    <div class="col-md-9">
+                        <div *ngFor="let group of groups">{{group.displayName}}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

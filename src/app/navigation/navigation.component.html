@@ -9,7 +9,7 @@
             <a class="nav-link" aria-current="page" routerLink="">Home</a>
             <a class="nav-link" href="#">Features</a>
             <a class="nav-link" href="#">Pricing</a>
-            <div *ngIf="user && user.role < 2">
+            <div *ngIf="isDev">
               <div ngbDropdown class="d-inline-block">
                 <a role="button" class="link-{{theme.text}} me-2 nav-link dropdown-toggle" id="admin" ngbDropdownToggle>Admin</a>
                 <div ngbDropdownMenu aria-labelledby="admin">
@@ -19,19 +19,19 @@
               </div>       
             </div>
         </div>
-        <div *ngIf="!user">
-          <button class="btn btn-secondary" routerLink="login">Login</button>
-          <button class="btn  btn-secondary me-2 ms-2" routerLink="sign-up">Sign Up</button>
+        <div *ngIf="!loginDisplay">
+          <button class="btn btn-secondary me-2" (click)="login()">Login</button>
         </div>
-        <div *ngIf="user">
+        <div *ngIf="loginDisplay">
+          <button class="btn btn-secondary me-2" (click)="logout()">Logout</button>
           <div ngbDropdown class="d-inline-block">
             <a role="button" class="link-{{theme.text}} me-2 nav-link dropdown-toggle" id="displayName" ngbDropdownToggle>{{displayName}}</a>
             <div ngbDropdownMenu aria-labelledby="displayName">
               <button ngbDropdownItem>My Account</button>
-              <button ngbDropdownItem [routerLink]="'users/' + user.id">Edit Profile</button>
+              <button ngbDropdownItem routerLink="me">Edit Profile</button>
               <button ngbDropdownItem (click)="logout()">Logout</button>
             </div>
-          </div>        
+          </div>     
         </div>
         <span class="navbar-text">
           <div class="form-check form-switch">

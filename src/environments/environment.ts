@@ -7,6 +7,10 @@ export const environment = {
   apiUrl: 'https://localhost:7279/api/',
   loggingEnabled: true,
   activitiesImgUrl: '../../assets/activities/',
+  azureAD: {
+    authUrl: 'api://f45cae57-dd3e-46d7-8d33-f788033bce25/',
+    graphUrl: 'https://graph.microsoft.com/v1.0/'
+  }
 };
 
 /*
