@@ -1,16 +1,13 @@
-import { Component, OnInit, Input, Output, OnDestroy, Inject } from '@angular/core';
-import { NgModel } from '@angular/forms';
+import { Component, OnInit, Input, OnDestroy, Inject } from '@angular/core';
 import { ThemeService } from '../shared/services/theme-service';
 import { SiteTheme } from '../site-theme';
 import { UserService } from '../shared/services/user-service';
-import { User } from '../models/user';
 import { Router } from '@angular/router';
 import { filter, Subject, Subscription, takeUntil } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { StorageService } from '../shared/services/storage.service';
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import { EventMessage, EventType, InteractionStatus, RedirectRequest } from '@azure/msal-browser';
-import { inject } from '@angular/core/testing';
 import { GraphService } from '../shared/services/graph.service';
 import { Role } from '../models/azure/enums';
 

@@ -49,9 +49,9 @@ const isIE = window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigato
     NgbModule,
     MsalModule.forRoot(new PublicClientApplication({
       auth: {
-        clientId: "f45cae57-dd3e-46d7-8d33-f788033bce25",
-        authority: "https://login.microsoftonline.com/f26c353e-08e3-45cb-aa2a-a2231a391931",
-        redirectUri: "https://localhost:4200"
+        clientId: environment.azureAD.clientId,
+        authority: environment.azureAD.authority + environment.azureAD.tokenId,
+        redirectUri: environment.hostedUrl,
       },
       cache: {
         cacheLocation: "localStorage",
