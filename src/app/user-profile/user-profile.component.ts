@@ -89,30 +89,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    let textualInfo: AbstractControl[] = [];
-    let title = this.updateForm.get('title');
-    if (title !== null) { textualInfo.push(title); }
-    let firstName = this.updateForm.get('firstName');
-    if (firstName !== null) { textualInfo.push(firstName); }
-    let lastName = this.updateForm.get('lastName');
-    if (lastName !== null) {textualInfo.push(lastName); }
-    let email = this.updateForm.get('email');
-    let password = this.updateForm.get('password');
-    if (email && email.dirty && email.valid) {
-      this.userService.updateEmail(this.user!.id, email.value).subscribe();
-    }
-    if (password && password.dirty && password.valid) {
-      this.userService.updatePassword(this.user!.id, password.value).subscribe();
-    }
-    if (textualInfo.length > 0) {
-      this.subs.push(this.userService.updateUserInfo(this.user!.id, {
-        id: this.user?.id,
-        title: title?.value,
-        firstName: firstName?.value,
-        lastName: lastName?.value
-      } as User).subscribe({
-        complete: () => this.location.back()
-      }));
-    }
+    //removed the code as this would need to be completely re-done to push the update to azure
   }
 }

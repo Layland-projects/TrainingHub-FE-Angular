@@ -15,6 +15,8 @@ import { UpdateEmailDto } from '../../dtos/update-email-dto';
 import { UpdatePasswordDto } from '../../dtos/update-password-dto';
 import { Result } from '../../models/result';
 import { StorageService } from './storage.service';
+import { GraphProfile } from 'src/app/models/azure/graph-profile';
+import { Role } from 'src/app/models/azure/enums';
 
 @Injectable({
   providedIn: 'root'
@@ -37,14 +39,6 @@ export class UserService {
     private storage: StorageService) {
       this.userSignedIn$ = new EventEmitter();
       this.userSignedOut$ = new EventEmitter();
-      let uId = this.storage.get<number>('userId');
-      if (uId) {
-        this.getUser(uId).subscribe(usr => {
-          if (usr.data) {
-            this.signIn(usr.data.email, usr.data.password ?? "123").subscribe();
-          }
-        })
-      }
    }
 
   getUsers(pageSize: number = 10, pageNum: number = 0) : Observable<Result<User[]>> {
@@ -59,76 +53,25 @@ export class UserService {
     );
   }
 
-  signIn(email: string, password: string) : Observable<Result<number>> {
-    return this.http.post<Result<number>>(this.apiUrl + 'signin', 
-    { 
-      email: email, 
-      password: password 
-    } as SignInDTO, this.httpOptions).pipe(
-      tap(res => {
-        if (this.logging) {
-          console.log(`User Service | SignIn received ID: ${res.data}`);
-        }
-        if (res.data !== undefined){
-          this.getUser(res.data).subscribe(u => {
-            let user = u.data;
-            if (user !== undefined) {
-              this.setDisplayName(user);
-              this.loggedInUser = user;
-              this.storage.add('userId', user.id);
-              this.userSignedIn$.emit(user);
-              this.router.navigate(['../'], { relativeTo: this.route });
-            }
-          });
-        }
-      }),
-      catchError(this.handleError<Result<number>>('signIn')),
-    );
-  }
-
-  signUp(email: string, password: string, 
-    title: string, firstName: string, lastName: string, role: number) : Observable<Result<User>> {
-    return this.http.post<Result<User>>(this.apiUrl + 'signup', {
-      title: title,
-      firstName: firstName, 
-      lastName: lastName, 
-      email: email, 
-      username: email,
-      password: password,
-      role: role
-    } as SignUpDTO,
-    this.httpOptions)
-    .pipe(
-      tap(_ => {
-        if (this.logging){
-          console.log('User Service | SignUp Success');
-        }
-        this.signIn(email, password).subscribe();
-      }),
-      catchError(this.handleError<Result<User>>('signUp'))
-    );
-  }
-
-  logout(id: number) : Observable<Result<any>> {
-    return this.http.post<Result<any>>(this.apiUrl + 'signout',
+  register(profile: GraphProfile, roles: Role[]) : Observable<Result<any>> {
+    let role = roles.includes(Role.Admin) ? 0 : roles.includes(Role.Dev) ? 1 : 2;
+    return this.http.post<Result<any>>(this.apiUrl + 'register', 
     {
-      id: id
-    } as SignOutDto,
+      id: profile.id,
+      email: profile.userPrincipalName,
+      firstName: profile.givenName,
+      lastName: profile.surname,
+      contactNumber: profile.mobilePhone,
+      role: role
+    },
     this.httpOptions)
     .pipe(
       tap(res => {
         if (this.logging) {
-          console.log('User Service | SignOut Success', res);
+          console.log('User Service | Register', res);
         }
-        this.displayName = undefined;
-        this.loggedInUser = undefined;
-        if (this.storage.get<number>('userId')) {
-          this.storage.remove('userId');
-        }
-        this.userSignedOut$.emit(id);
-      }),
-      catchError(this.handleError<Result<any>>('logout'))
-    )
+      })
+    );
   }
 
   getUser(id: number) : Observable<Result<User>> {
@@ -143,80 +86,15 @@ export class UserService {
     );
   }
 
-  forgotPassword(email: string) : Observable<Result<any>> {
-    return this.http.post<Result<any>>(this.apiUrl + 'forgotpassword',
-    {
-      email: email
-    } as ForgotPasswordDTO,
-    this.httpOptions)
+  getUserByAzureId(azureId: string) : Observable<Result<User>> {
+    return this.http.get<Result<User>>(this.apiUrl + `azure/${azureId}`)
     .pipe(
-      tap(obj => {
+      tap(user => {
         if (this.logging) {
-          console.log('User Service | ForgotPassword sent', obj);
-        }
-        this.router.navigate(['../login'], { relativeTo: this.route });
-      }),
-      catchError(this.handleError<Result<any>>('forgotPassword'))
-    );
-  }
-
-  updateEmail(id: number, email: string) : Observable<Result<any>> {
-    return this.http.post<Result<any>>(this.apiUrl + 'updateEmail', 
-    { 
-      id: id,
-      email: email
-    } as UpdateEmailDto,
-    this.httpOptions)
-    .pipe(
-      tap(res => {
-        if (this.logging) {
-          console.log('User Service | UpdateEmail sent', res);
-        }
-        if (id === this.loggedInUser?.id){
-          this.getUser(this.loggedInUser?.id).subscribe(user => this.loggedInUser = user.data);
+          console.log(`User Service | User retrieved | AzureId: ${azureId}`, user);
         }
       }),
-      catchError(this.handleError<Result<any>>('updateEmail'))
-    );
-  }
-
-  updatePassword(id: number, password: string) : Observable<Result<any>> {
-    return this.http.post<Result<any>>(this.apiUrl + 'updatePassword', 
-    {
-      id: id,
-      password: password
-    } as UpdatePasswordDto,
-    this.httpOptions)
-    .pipe(
-      tap(res => {
-        if (this.logging) {
-          console.log('User Service | UpdatePassword sent', res);
-        }
-        if (this.loggedInUser?.id === id){
-          this.getUser(this.loggedInUser.id).subscribe(user => this.loggedInUser = user.data);
-        }
-      }),
-      catchError(this.handleError<Result<any>>('updatePassword'))
-    );
-  }
- 
-  updateUserInfo(id: number, user: User) : Observable<Result<any>> {
-    return this.http.put<Result<any>>(this.apiUrl + `${id}`, 
-    user,
-    this.httpOptions)
-    .pipe(
-      tap(res => {
-        if (this.logging) {
-          console.log('User Service | UpdateUser sent', res);
-          console.log(`Success: ${res.status === 1}`);
-        }
-        if (res.status === 1 && id === this.loggedInUser?.id) {
-          this.setDisplayName(user)
-          this.getUser(id).subscribe(u => this.userSignedIn$.emit(u.data));
-          //update worked server side so let's refresh the app display
-        }
-      }),
-      catchError(this.handleError<Result<any>>('updateUser'))
+      catchError(this.handleError<Result<User>>('getUserByAzureId'))
     );
   }
 
@@ -227,9 +105,5 @@ export class UserService {
 
       return of(result as T);
     }
-  }
-
-  private setDisplayName(user: User): void {
-    this.displayName = user.username ? user.username : user.firstName;
   }
 }

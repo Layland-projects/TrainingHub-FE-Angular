@@ -27,9 +27,10 @@ export class GraphService {
     .pipe(
       tap(res => {
         if (this.logging) {
-          console.log('GraphService | Me', res);
+          console.log('GraphService | me', res);
         }
-        this.storageService.add('username', res.givenName);
+        this.storageService.add('profile', JSON.stringify(res));
+        this.storageService.add('displayName', res.displayName);
       })
     );
   }

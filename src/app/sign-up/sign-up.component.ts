@@ -76,15 +76,7 @@ export class SignUpComponent implements OnInit {
   }
 
   submit():void {
-    this.userService.signUp(
-      this.signUpForm.controls['email'].value, 
-      this.signUpForm.controls['password'].value,
-      this.signUpForm.controls['title'].value,
-      this.signUpForm.controls['firstName'].value,
-      this.signUpForm.controls['lastName'].value,
-      this.signUpForm.controls['role'].value)
-      .subscribe();
-    console.log('form submitted', [ this.signUpForm ])
+    //this component as a whole may be removed now as it's being done by azure
   }
 
   selectRole(): void {

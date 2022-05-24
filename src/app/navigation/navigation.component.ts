@@ -3,13 +3,14 @@ import { ThemeService } from '../shared/services/theme-service';
 import { SiteTheme } from '../site-theme';
 import { UserService } from '../shared/services/user-service';
 import { Router } from '@angular/router';
-import { filter, Subject, Subscription, takeUntil } from 'rxjs';
+import { filter, Subject, Subscription, takeUntil, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { StorageService } from '../shared/services/storage.service';
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import { EventMessage, EventType, InteractionStatus, RedirectRequest } from '@azure/msal-browser';
 import { GraphService } from '../shared/services/graph.service';
 import { Role } from '../models/azure/enums';
+import { GraphProfile } from '../models/azure/graph-profile';
 
 @Component({
   selector: 'app-navigation',
@@ -34,7 +35,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   @Input() title: string = '';
   theme = this.themeService.theme;
-  displayName?: string = this.storageService.get<string>('username');
+  displayName?: string = this.storageService.get<string>('displayName');
   roles?: Role[] = this.storageService.get<Role[]>('roles');
   subs: Subscription[] = [];
   logging: boolean = environment.loggingEnabled;
@@ -69,43 +70,42 @@ export class NavigationComponent implements OnInit, OnDestroy {
         this.setLoginDisplay();
       })
     );
+
+    //Init login subscription
     this.subs.push(this.broadcastService.msalSubject$
       .pipe(
-        filter((event: EventMessage) => event.eventType === EventType.LOGIN_SUCCESS)
+        filter((event: EventMessage) => event.eventType === EventType.LOGIN_SUCCESS),
+        tap(_ => {
+          if (this.logging) {
+            console.log('NavigationComponent | Login event received');
+          }
+        })
       )
       .subscribe(_ => {
-        //Setup username in storage
-        let username = this.storageService.get<string>('username');
-        if (username) {
-          this.displayName = username;
-        }
-        else {
-          this.subs.push(this.graphService.getProfile().subscribe(profile => {
-            this.displayName = profile.givenName;
-            this.storageService.add('username', profile.givenName);
-          }));
-        }
-        //Setup roles in storage
-        let roles = this.storageService.get<Role[]>('roles');
-        if (roles) {
-          this.roles = roles;
-        }
-        else {
-          this.subs.push(this.graphService.getCurrentUserGroups()
-          .subscribe(r => {
-            this.roles = r.map(x => x.id as Role);
-            this.storageService.add('roles', JSON.stringify(r));
-          }));
-        }
+        this.subs.push(this.graphService.getProfile().subscribe(p => {
+          let profile = p;
+            this.subs.push(this.graphService.getCurrentUserGroups()
+            .subscribe(r => {
+              this.roles = r.map(groups => groups.id as Role);
+              let roles = this.roles;
+              this.subs.push(this.userService.register(profile, roles).subscribe());
+            }));
+        }));
     }));
+
+    //Init logout subscription
     this.subs.push(this.broadcastService.msalSubject$
       .pipe(
         filter((event: EventMessage) => event.eventType === EventType.LOGOUT_SUCCESS)
       )
       .subscribe(_ => {
-        let username = this.storageService.get<string>('username');
-        if (username) {
-          this.storageService.remove('username');
+        let profile = this.storageService.get<GraphProfile>('profile');
+        if (profile) {
+          this.storageService.remove('profile');
+        }
+        let roles = this.storageService.get<string[]>('roles');
+        if (roles) {
+          this.storageService.remove('roles');
         }
       })
     );
@@ -136,5 +136,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   setLoginDisplay(): void {
     this.loginDisplay = this.authService.instance.getAllAccounts().length > 0;
+    this.displayName = this.storageService.get<string>('displayName');
   }
 }

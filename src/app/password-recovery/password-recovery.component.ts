@@ -37,9 +37,6 @@ export class PasswordRecoveryComponent implements OnInit {
   }
 
   submit():void {
-    this.userService.forgotPassword(
-      this.recoveryForm.controls['email'].value)
-      .subscribe();
-    console.log('form submitted', [ this.recoveryForm ])
+    //this has been removed now as this is handled by azure, may remove the whole component
   }
 }

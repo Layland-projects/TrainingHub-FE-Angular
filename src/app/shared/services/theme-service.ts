@@ -18,9 +18,16 @@ export class ThemeService {
     if (storageBg) {
       this.theme.background = storageBg;
     }
+    else {
+      this.storage.add('theme-bg', 'light');
+    }
     if (storageTxt) {
       this.theme.text = storageTxt;
     }
+    else {
+      this.storage.add('theme-txt', 'dark');
+    }
+    this.themeChanged$.emit(this.theme);
    }
 
   toggleTheme(): void {

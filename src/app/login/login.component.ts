@@ -41,10 +41,6 @@ export class LoginComponent implements OnInit {
   }
 
   submit():void {
-    this.userService.signIn(
-      this.loginForm.controls['email'].value, 
-      this.loginForm.controls['password'].value)
-      .subscribe();
-    console.log('form submitted', [ this.loginForm ])
+    //this has been removed and maybe the whole component as this is handled by azure now
   }
 }
